@@ -1,0 +1,67 @@
+<style>
+    .tile {
+        transition: all ease-in 200ms;
+    }
+</style>
+<div class="grid" id="grid">
+  <div class="tile">1</div>
+  <div class="tile">2</div>
+  <div class="tile">3</div>
+  <div class="tile">4</div>
+  <div class="tile">5</div>
+  <div class="tile">6</div>
+</div>
+
+<style>
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  gap: 10px;
+}
+
+.tile {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: steelblue;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+</style>
+
+<script>
+const grid = document.getElementById("grid");
+
+grid.addEventListener("click", (e) => {
+  const tile = e.target.closest(".tile");
+  if (!tile) return;
+
+  // Capture old positions
+  const first = [...grid.children].map(el => ({
+    el,
+    rect: el.getBoundingClientRect()
+  }));
+
+  // Change order
+  grid.prepend(tile);
+
+  // Capture new positions and animate
+  first.forEach(({ el, rect }) => {
+    const lastRect = el.getBoundingClientRect();
+
+    const dx = rect.left - lastRect.left;
+    const dy = rect.top - lastRect.top;
+
+    el.animate([
+      { transform: `translate(${dx}px, ${dy}px)` },
+      { transform: "translate(0,0)" }
+    ], {
+      duration: 400,
+      easing: "ease"
+    });
+  });
+});
+</script>

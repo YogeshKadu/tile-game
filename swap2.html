@@ -1,0 +1,85 @@
+<div class="grid" id="grid">
+  <div class="tile">1</div>
+  <div class="tile">2</div>
+  <div class="tile">3</div>
+  <div class="tile">4</div>
+</div>
+
+<style>
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 100px);
+  gap: 10px;
+}
+
+.tile {
+  height: 100px;
+  background: steelblue;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+}
+</style>
+
+<script>
+const grid = document.getElementById("grid");
+let firstTile = null;
+
+grid.addEventListener("click", (e) => {
+  const tile = e.target.closest(".tile");
+  if (!tile) return;
+
+  if (!firstTile) {
+    firstTile = tile;
+    tile.style.outline = "3px solid orange";
+    return;
+  }
+
+  if (firstTile === tile) return;
+
+  // Save old positions
+  const items = [...grid.children];
+  const positions = new Map(
+    items.map(el => [el, el.getBoundingClientRect()])
+  );
+
+  // Swap DOM positions
+  const firstNext = firstTile.nextSibling;
+  const secondNext = tile.nextSibling;
+
+  const firstParent = firstTile.parentNode;
+  const secondParent = tile.parentNode;
+
+  if (firstNext === tile) {
+    secondParent.insertBefore(tile, firstTile);
+  } else if (secondNext === firstTile) {
+    firstParent.insertBefore(firstTile, tile);
+  } else {
+    firstParent.insertBefore(firstTile, secondNext);
+    secondParent.insertBefore(tile, firstNext);
+  }
+
+  // Animate movement
+  items.forEach(el => {
+    const oldPos = positions.get(el);
+    const newPos = el.getBoundingClientRect();
+
+    const dx = oldPos.left - newPos.left;
+    const dy = oldPos.top - newPos.top;
+
+    el.animate([
+      { transform: `translate(${dx}px, ${dy}px)` },
+      { transform: 'translate(0,0)' }
+    ], {
+      duration: 400,
+      easing: 'ease-in-out'
+    });
+  });
+
+  firstTile.style.outline = "";
+  firstTile = null;
+});
+</script>
