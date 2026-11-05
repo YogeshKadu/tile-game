@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tile</title>
+    <style>
+        :root {
+            --background: url("https://picsum.photos/400/400");
+            --complexity: 3;
+        }
+        body {
+            margin: 0px;
+            padding: 2rem;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background: #f5f5f5;
+        }
+        #tile-grid {
+            /* background-color: #fff; */
+            /* background-image: var(--background); */
+            background-size: cover;
+            background-repeat: no-repeat;
+            
+            display: grid;
+            width: 400px;
+            grid-template-columns: repeat(var(--complexity), 1fr);
+            grid-template-rows: auto;
+            gap: 0.125rem;
+            border: 1px solid #AAA;
+            padding: 0rem;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        .tile {
+            /* background-color: #FFF; */
+            /* background-color: #f5f5ff; */
+            background-image: var(--background);
+            background-repeat: no-repeat;
+            aspect-ratio: 1;
+            /* border: 1px solid #afafaf; */
+            border: none;
+            /* border-radius: 0.25rem; */
+            font-size: 5rem;
+            font-weight: 500;
+            cursor: grab;
+            transition: transform ease-out 0.15s, scale ease-in 0.15s;
+        }
+        #tile-grid [data-id="2"] {background-position: -133px 0px;}
+        #tile-grid [data-id="3"] {background-position: -266px 0px;}
+        #tile-grid [data-id="4"] {background-position: 0px -133px;}
+        #tile-grid [data-id="5"] {background-position: -133px -133px;}
+        #tile-grid [data-id="6"] {background-position: -266px -133px;}
+        #tile-grid [data-id="7"] {background-position: 0px -266px;}
+        #tile-grid [data-id="8"] {background-position: -133px -266px;}
+        #tile-grid [data-id="9"] {background-position: -266px -266px;}
+        .tile:active {
+            cursor: grabbing;
+            /* scale: 0.5; */
+        }
+        .tile.active ~ .tile {
+            filter: grayscale(1);
+        }
+        .tile.highlighted {
+            filter: grayscale(1);
+        }
+        .tile:active,
+        .tile.dragging {
+            /* opacity: 0; */
+            /* background-color: #EAEAEA; */
+            scale: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <h2>Tile Game</h2>
+    <div id="tile-grid">
+        <button class="tile" draggable="true" data-id="1"></button>
+        <button class="tile" draggable="true" data-id="2"></button>
+        <button class="tile" draggable="true" data-id="3"></button>
+        <button class="tile" draggable="true" data-id="4"></button>
+        <button class="tile" draggable="true" data-id="5"></button>
+        <button class="tile" draggable="true" data-id="6"></button>
+        <button class="tile" draggable="true" data-id="7"></button>
+        <button class="tile" draggable="true" data-id="8"></button>
+        <button class="tile" draggable="true" data-id="9"></button>
+    </div>
+
+    <script>
+        const grid = document.getElementById("tile-grid");
+        const tiles = document.querySelectorAll(".tile");
+        let firstTile = null;
+        let secondTile = null;
+
+        tiles.forEach((tile) => {
+            tile.addEventListener("dragstart", (event) => {
+                firstTile = event.target;
+                tile.classList.add("dragging");
+            });
+
+            tile.addEventListener("dragend", () => {
+                // console.log(firstTile.dataset.id,secondTile.dataset.id);
+                SwapTiles(firstTile, secondTile);
+                firstTile.classList.remove("highlighted");
+                secondTile.classList.remove("highlighted");
+                tile.classList.remove("dragging");
+                firstTile = null;
+                secondTile = null;
+
+            });
+            tile.addEventListener("click", () => {
+                if(!firstTile) {
+                    firstTile = tile;
+                    firstTile.classList.add("dragging");
+                    return;
+                }
+                firstTile.classList.remove("dragging");
+                SwapTiles(firstTile, tile);
+                firstTile = null;
+                secondTile = null;
+            });
+        });
+        grid.addEventListener("dragover", (event) => {
+            event.preventDefault();
+            const selected = grid.querySelector(".dragging");
+            if(!selected) {
+                return;
+            }
+            const {clientX, clientY} = event;
+            const ItemToReplaceWith = getItemBelowCursor(grid, {clientX, clientY});
+            // if(ItemToReplaceWith && ItemToReplaceWith.dataset.id == firstTile.dataset.id) {
+            //     return;
+            // }
+            ItemToReplaceWith.classList.add("highlighted");
+            secondTile = ItemToReplaceWith;
+        });
+
+        function getItemBelowCursor(grid, cursor) {
+            const nonDraggingItems = [
+                ...grid.querySelectorAll(".tile")
+            ];
+            //...grid.querySelectorAll(".tile:not(.dragging)");
+            const {clientX, clientY} = cursor;
+            return nonDraggingItems.reduce(
+            (closest, item) => {
+                const rect = item.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                item.classList.remove("highlighted");
+
+                // Squared distance (faster than Math.sqrt)
+                const distance =
+                    (clientX - centerX) ** 2 +
+                    (clientY - centerY) ** 2;
+
+                if (distance < closest.distance) {
+                    return {
+                        distance,
+                        element: item
+                    };
+                }
+
+                return closest;
+            }, {
+                distance: Infinity,
+                element: null
+            }).element;
+        }
+
+        function SwapTiles(first, second){
+            if(first == second)
+                return;
+            const previousSpecs = [...grid.children].map((el) => ({
+                element: el,
+                rect: el.getBoundingClientRect() 
+            }));
+            // Swap DOM positions
+            const firstNext = first.nextSibling;
+            const secondNext = second.nextSibling;
+
+            const firstParent = first.parentNode;
+            const secondParent = second.parentNode;
+
+            if (firstNext === second) {
+                secondParent.insertBefore(second, first);
+            } else if (secondNext === first) {
+                firstParent.insertBefore(first, second);
+            } else {
+                firstParent.insertBefore(first, secondNext);
+                secondParent.insertBefore(second, firstNext);
+            }
+
+
+            previousSpecs.forEach(({ element: el, rect }) => {
+                const lastRect = el.getBoundingClientRect();
+
+                const dx = rect.left - lastRect.left;
+                const dy = rect.top - lastRect.top;
+
+                el.animate([
+                    { transform: `translate(${dx}px, ${dy}px)` },
+                    { transform: "translate(0,0)" }
+                ], {
+                    duration: 400,
+                    easing: "ease"
+                });
+            });
+
+        }
+
+    </script>
+</body>
+</html>

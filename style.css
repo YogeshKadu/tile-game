@@ -1,0 +1,160 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap');
+:root {
+    --accent: #f3fdff;
+    --accent-500: #d6f8ff;
+    --accent-600: #94ebfd;
+    --secondary-accent: #b6d2fd;
+    --outline: #ff0000;
+    --dark-accent-100: #AAA;
+    --dark-accent: #333433;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+    /* variable */
+    --xpos: 0%;
+    --ypos: 0%;
+    --image: url("./assets/download2.jpg");
+}
+.noto {
+  font-family: "Noto Color Emoji", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+body {
+    margin: 0px;
+    padding: 0px;
+}
+.bg-accent {
+    background-color: var(--accent);
+}
+
+.container {
+    height: 100dvh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+}
+.container #menu-card,
+.container #game-board
+ {
+    width: 100%;
+    max-width: 32rem;
+    padding: 0.75rem;
+    padding-top: 1rem;
+    height: calc(100dvh - 1.75rem);
+    background-color: var(--accent);
+    /* border: 1px solid var(--dark-accent); */
+}
+.container .header {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn {
+    margin: 0px;
+    box-sizing: border-box;
+    position: relative;
+    cursor: pointer;
+    outline: none;
+    --radius: 2rem;
+}
+.btn.btn-circle {
+    height: 3rem;
+    width: 3rem;
+}
+.btn,
+.btn .float {
+    border: 1px solid var(--dark-accent);
+    border-radius: var(--radius);
+    background-color: var(--accent-500);
+}
+
+.btn .float {
+    display: grid;
+    place-content: center;
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: -0px;
+    left: 0px;
+    position: absolute;
+    margin: -1px;
+    transform: translateY(-4px);
+    transition: transform ease-in-out 50ms;
+}
+.btn:focus .float {
+    background-color: var(--accent-600);
+}
+.btn:active .float {
+    transform: translateY(0px);
+}
+.btn svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+.game-title {
+    font-size: xx-large;
+    font-weight: 800;
+    color: var(--dark-accent);
+    padding: 3rem 0px;
+}
+.btn-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0 auto;
+    row-gap: 1rem;
+    width: 100%;
+    max-width: 320px;
+}
+.btn.btn-capsule {
+    padding: 0.5rem;
+    height: 3rem;
+    --radius: 0.8rem;
+    background-color: #535353;
+}
+.btn.btn-capsule p {
+    margin: 0px;
+}
+/* Game board start */
+#game-board .body {
+    padding: 5rem 1rem;
+}
+#game-board .body #board {
+    /* background-image: var(--image);
+    background-repeat: no-repeat;
+    background-position: 8px 8px;
+    background-size: calc(512px - 50px) calc(512px - 50px); */
+
+    aspect-ratio: 1;
+    border-radius: 0.25rem;
+    border: 1px solid var(--dark-accent-100);
+    box-shadow: inset 4px 4px 4px #EAEAEA;
+    padding: 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: min-content;
+    /* gap: 1px; */
+}
+#game-board .body #board .tile {
+    /* user-select: none; */
+    background-image: var(--image);
+    aspect-ratio: 1;
+    background-position: calc(var(--xpos) + 0%) calc(var(--ypos) + 0%);
+    background-repeat: no-repeat;
+    background-size: calc(512px - 50px) calc(512px - 50px);
+    transition: filter ease-in-out 100ms, scale ease-in-out 100ms;
+}
+
+#game-board .body #board .tile.dragging {
+    filter: sepia(1);
+    scale: 0.9;
+
+}
+#game-board .body #board .tile.highlighted {
+    filter: sepia(1);
+    scale: 1.02;
+}
+
+/* Game board end */
