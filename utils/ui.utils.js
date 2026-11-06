@@ -54,6 +54,7 @@ export function GetItemBelowCursor(grid, cursor) {
 
 //#region private function
 function _addEvents(tile) {
+    // Existing click functionality
     tile.addEventListener("click", () => {
         const first = document.querySelector(".dragging");
         if(!first)
@@ -64,6 +65,8 @@ function _addEvents(tile) {
             _SwapTiles(first, tile);
         }
     });
+
+    // Desktop drag functionality
     tile.addEventListener("dragstart", () => {
         tile.classList.add("dragging");
     });
@@ -72,7 +75,34 @@ function _addEvents(tile) {
         const highlighted = board.querySelector(".highlighted");
         if(highlighted)
             highlighted.classList.remove("highlighted");
-        _SwapTiles(tile, highlighted);
+        if(tile !== highlighted)
+            _SwapTiles(tile, highlighted);
+    });
+
+    // Mobile touch functionality
+    tile.addEventListener("pointerdown", (e) => {
+        if (e.pointerType === "mouse") return;
+
+        tile.classList.add("dragging");
+        tile.setPointerCapture(e.pointerId);
+    });
+
+    tile.addEventListener("pointerup", (e) => {
+        if (e.pointerType === "mouse") return;
+
+        tile.classList.remove("dragging");
+
+        const highlighted = board.querySelector(".highlighted");
+
+        if (highlighted)
+            highlighted.classList.remove("highlighted");
+
+        if(highlighted && tile && tile !== highlighted)
+            _SwapTiles(tile, highlighted);
+    });
+
+    tile.addEventListener("pointercancel", () => {
+        tile.classList.remove("dragging");
     });
 }
 

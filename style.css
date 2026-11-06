@@ -12,7 +12,7 @@
     /* variable */
     --xpos: 0%;
     --ypos: 0%;
-    --image: url("https://picsum.photos/500/500");
+    --image: url("https://picsum.photos/536/536");
 }
 .noto {
   font-family: "Noto Color Emoji", sans-serif;
@@ -58,6 +58,7 @@ body {
     cursor: pointer;
     outline: none;
     --radius: 2rem;
+    touch-action: none;
 }
 .btn.btn-circle {
     height: 3rem;
@@ -122,20 +123,17 @@ body {
     padding: 5rem 1rem;
 }
 #game-board .body #board {
-    /* background-image: var(--image);
+    background-image: var(--image);
     background-repeat: no-repeat;
-    background-position: 8px 8px;
-    background-size: calc(512px - 50px) calc(512px - 50px); */
+    background-size: calc(min(536px, 100vw) - 56px) calc(min(536px, 100vw) - 56px);
 
+    background-color: var(--accent) !important;
     aspect-ratio: 1;
     border-radius: 0.25rem;
-    border: 1px solid var(--dark-accent-100);
-    box-shadow: inset 4px 4px 4px #EAEAEA;
-    padding: 0.5rem;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-auto-rows: min-content;
-    /* gap: 1px; */
+
 }
 #game-board .body #board .tile {
     /* user-select: none; */
@@ -143,10 +141,18 @@ body {
     aspect-ratio: 1;
     background-position: calc(var(--xpos) + 0%) calc(var(--ypos) + 0%);
     background-repeat: no-repeat;
-    background-size: calc(512px - 50px) calc(512px - 50px);
+    background-size: calc(min(536px, 100vw) - 56px) calc(min(536px, 100vw) - 56px);
     transition: filter ease-in-out 100ms, scale ease-in-out 100ms;
+    transition: opacity ease-in-out 200ms;
+    opacity: 1;
+    touch-action: none;
 }
-
+#game-board .body #board.help .tile {
+    opacity: 0;
+}
+#game-board .body #board .tile:disabled {
+    cursor: not-allowed;
+}
 #game-board .body #board .tile.dragging {
     filter: sepia(1);
     scale: 0.9;
